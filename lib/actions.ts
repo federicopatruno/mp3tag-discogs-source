@@ -219,7 +219,7 @@ function getDiscNumber(position: string) {
     .trim();
 
   if (!isNaN(+discNumber)) {
-    return +discNumber;
+    return +discNumber === 0 ? 1 : +discNumber;
   } else if (!discNumber) {
     return 1;
   } else {
