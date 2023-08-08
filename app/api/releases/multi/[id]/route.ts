@@ -45,7 +45,7 @@ export async function GET(
     series: getNestedField(json.series, "name"),
     series_number: getNestedField(json.series, "catno"),
     styles: getField(json.styles),
-    totaldiscs: json.format_quantity === 0 ? 1 : json.format_quantity,
+    totaldiscs: json.format_quantity == 0 ? 1 : json.format_quantity,
     total_tracks: tracklist.length,
     tracklist: tracklist,
     www: `${discogsReleaseBaseUrl}/${json.id}`,
