@@ -5,7 +5,7 @@ export function getField(field: any, separator: string = "\\\\") {
     if (Array.isArray(field)) {
       return field.join(separator).trim();
     }
-    return field;
+    return typeof field === "string" ? field.replace(suffixRegex, "") : field;
   }
 }
 
@@ -120,6 +120,7 @@ export function getTracklist(
   albumArtist: string,
   multi: boolean = false
 ) {
+  console.log("TRACKLIST");
   const positionRegex: RegExp = new RegExp(/(.+)([a-z]|\.\d+)/);
   const featuringRegex: RegExp = new RegExp(
     /( feat| feat.| featuring| ,|&| &,|,&)$/

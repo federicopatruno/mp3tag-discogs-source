@@ -27,11 +27,11 @@ export async function GET(
   );
 
   const json = await response.json();
-  const tracklist = getTracklist(json.tracklist, json.artists_sort);
+  const albumArtist = getField(json.artists_sort);
+  const tracklist = getTracklist(json.tracklist, albumArtist);
   const data = {
     album: getField(json.title),
-    artist:
-      json.artists_sort === "Various" ? "Various Artists" : json.artists_sort,
+    artist: albumArtist === "Various" ? "Various Artists" : albumArtist,
     catalog_number: getNestedField(json.labels, "catno"),
     compilation: isCompilation(json.tracklist),
     country: getField(json.country),
