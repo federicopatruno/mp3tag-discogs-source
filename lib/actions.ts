@@ -1,4 +1,5 @@
 const suffixRegex: RegExp = new RegExp(/ \(\d+\)$/);
+const artistParenthesisRegex: RegExp = new RegExp(/ \(\d{1,2}\)/);
 
 export function getField(field: any, separator: string = "\\\\") {
   if (field) {
@@ -7,6 +8,14 @@ export function getField(field: any, separator: string = "\\\\") {
     }
     return typeof field === "string" ? field.replace(suffixRegex, "") : field;
   }
+}
+
+export function getAlbumArtist(field: string) {
+  const artist = field.replace(artistParenthesisRegex, "");
+  if (artist.endsWith(", The")) {
+    return `The ${artist.replace(/, The$/, "")}`;
+  }
+  return artist;
 }
 
 export function getNestedField(

@@ -1,5 +1,6 @@
-import { artistParenthesis, discogsReleaseBaseUrl } from "@/constants";
+import { discogsReleaseBaseUrl } from "@/constants";
 import {
+  getAlbumArtist,
   getField,
   getMediaFormat,
   getNestedField,
@@ -27,10 +28,7 @@ export async function GET(
   );
 
   const json = await response.json();
-  const albumArtist = getField(json.artists_sort).replace(
-    artistParenthesis,
-    ""
-  );
+  const albumArtist = getAlbumArtist(json.artists_sort);
   const tracklist = getTracklist(json.tracklist, albumArtist);
   const data = {
     album: getField(json.title),
