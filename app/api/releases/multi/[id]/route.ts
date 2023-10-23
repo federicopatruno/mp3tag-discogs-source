@@ -32,7 +32,7 @@ export async function GET(
   const tracklist = getTracklist(json.tracklist, albumArtist, true);
   const data = {
     album: getField(json.title),
-    artist: albumArtist === "Various" ? "Various Artists" : json.artists_sort,
+    artist: albumArtist === "Various" ? "Various Artists" : albumArtist,
     catalog_number: getNestedField(json.labels, "catno"),
     compilation: isCompilation(json.tracklist),
     country: getField(json.country),
