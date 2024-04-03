@@ -1,7 +1,7 @@
 const suffixRegex: RegExp = new RegExp(/ \(\d+\)$/);
 const artistParenthesisRegex: RegExp = new RegExp(/ \(\d{1,2}\)/);
 
-export function getField(field: any, separator: string = "\\\\") {
+function getField(field: any, separator: string = "\\\\") {
   if (field) {
     if (Array.isArray(field)) {
       return field.join(separator).trim();
@@ -10,7 +10,7 @@ export function getField(field: any, separator: string = "\\\\") {
   }
 }
 
-export function getAlbumArtist(field: string) {
+function getAlbumArtist(field: string) {
   const artist = field.replace(artistParenthesisRegex, "");
   if (artist.endsWith(", The")) {
     return `The ${artist.replace(/, The$/, "")}`;
@@ -18,7 +18,7 @@ export function getAlbumArtist(field: string) {
   return artist;
 }
 
-export function getNestedField(
+function getNestedField(
   field: Array<any>,
   key: string,
   separator: string = "\\\\"
@@ -35,7 +35,7 @@ export function getNestedField(
   }
 }
 
-export function getMediaFormat(formats: Array<any>) {
+function getMediaFormat(formats: Array<any>) {
   if (formats.length > 0) {
     return formats
       .map((format: any) => {
@@ -68,14 +68,14 @@ function getArtists(artists: Array<any>) {
   return artist === "va" || artist === "Various" ? "Various Artists" : artist;
 }
 
-export function isCompilation(tracklist: Array<any>) {
+function isCompilation(tracklist: Array<any>) {
   return tracklist.filter((item: any) => item.type_ === "track" && item.artists)
     .length > 0
     ? 1
     : "";
 }
 
-export function getReleaseCredits(json: any) {
+function getReleaseCredits(json: any) {
   function getCredits(credits: Array<string>) {
     const newCredits = credits.join("\r\n");
     return newCredits !== "" ? `Credits:\r\n${newCredits}\r\n` : "";
@@ -129,7 +129,6 @@ export function getTracklist(
   albumArtist: string,
   multi: boolean = false
 ) {
-  console.log("TRACKLIST");
   const positionRegex: RegExp = new RegExp(/(.+)([a-z]|\.\d+)/);
   const featuringRegex: RegExp = new RegExp(
     /( feat| feat.| featuring| ,|&| &,|,&)$/
@@ -262,8 +261,14 @@ function parseMulti(tracklist: Array<any>) {
 
       const data = {
         title: `${prev.title} / ${curr.title}`,
-        artist: `${prev.artist} / ${curr.artist}`,
-        credits: `${prev.credits} / ${curr.credits}`,
+        artist:
+          prev.artist === curr.artist
+            ? `${curr.artist}`
+            : `${prev.artist} / ${curr.artist}`,
+        credits:
+          prev.credits === curr.credits
+            ? `${curr.credits}`
+            : `${prev.credits} / ${curr.credits}`,
         chapter: curr.chapter,
         discnumber: curr.discnumber,
         trackno: curr.trackno,
@@ -272,5 +277,70 @@ function parseMulti(tracklist: Array<any>) {
       };
       return data;
     })
+  );
+}
+
+export async function getDatabaseResults(searchParams: any) {
+  const token = process.env.DISCOGS_TOKEN || "";
+  const response = await fetch(
+    `https://api.discogs.com/database/search?${new URLSearchParams(
+      searchParams
+    )}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Discogs token=${token}`,
+      },
+    }
+  );
+
+  const json = await response.json();
+
+  return json;
+}
+
+export async function parseRelease(releaseId: any, multi: boolean = false) {
+  const token = process.env.DISCOGS_TOKEN || "";
+
+  const response = await fetch(
+    `https://api.discogs.com/releases/${releaseId}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Discogs token=${token}`,
+      },
+    }
+  );
+
+  const json = await response.json();
+
+  const albumArtist = getAlbumArtist(json.artists_sort);
+  const tracklist = getTracklist(json.tracklist, albumArtist, multi);
+  const data = {
+    album: getField(json.title),
+    artist: albumArtist === "Various" ? "Various Artists" : albumArtist,
+    catalog_number: getNestedField(json.labels, "catno"),
+    compilation: isCompilation(json.tracklist),
+    country: getField(json.country),
+    credits: getReleaseCredits(json),
+    format: getMediaFormat(json.formats),
+    genre: getField(json.genres),
+    images: json.images,
+    master_id: json.master_id,
+    publisher: getNestedField(json.labels, "name"),
+    release_id: json.id,
+    series: getNestedField(json.series, "name"),
+    series_number: getNestedField(json.series, "catno"),
+    styles: getField(json.styles),
+    totaldiscs: json.format_quantity == 0 ? 1 : json.format_quantity,
+    total_tracks: tracklist.length,
+    tracklist: tracklist,
+    www: `https://www.discogs.com/release/${json.id}`,
+    year: getField(json.year),
+  };
+
+  return Object.entries(data).reduce(
+    (a: any, [k, v]) => (v ? ((a[k] = v), a) : a),
+    {}
   );
 }

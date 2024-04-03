@@ -1,6 +1,3 @@
-import Image from "next/image";
-import React from "react";
-
 const Hero = () => {
   return (
     <section className="text-gray-400 bg-gray-900 body-font">
