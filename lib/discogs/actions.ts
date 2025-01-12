@@ -70,11 +70,8 @@ export async function getReleaseById(
 
 // Parse Album Artists
 function parseAlbumArtist(json: any) {
-  let artist = json.artists_sort.replace(artistParenthesisRegex, "");
-  if (artist.endsWith(", The")) {
-    artist.split(", The");
-    artist = `The ${artist[0]}`;
-  }
+  const artist = json.artists_sort.replace(artistParenthesisRegex, "");
+  if (artist.endsWith(", The")) return `The ${artist.split(", The")[0]}`;
   return artist;
 }
 
