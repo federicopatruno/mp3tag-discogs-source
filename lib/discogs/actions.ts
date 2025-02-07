@@ -2,7 +2,14 @@ const DISCOGS_TOKEN = process.env.DISCOGS_TOKEN || "";
 const suffixRegex: RegExp = new RegExp(/ \(\d+\)$/);
 const artistParenthesisRegex: RegExp = new RegExp(/ \(\d{1,2}\)/);
 
-export async function getDatabaseResults(searchParams: any) {
+export async function getDatabaseResults(
+  searchParams:
+    | string
+    | string[][]
+    | Record<string, string>
+    | URLSearchParams
+    | undefined
+) {
   const response = await fetch(
     `https://api.discogs.com/database/search?${new URLSearchParams(
       searchParams
@@ -12,12 +19,13 @@ export async function getDatabaseResults(searchParams: any) {
       headers: {
         Authorization: `Discogs token=${DISCOGS_TOKEN}`,
       },
+      cache: "no-cache",
     }
   );
 
-  const json = await response.json();
+  const results = await response.json();
 
-  return json;
+  return results;
 }
 
 export async function getReleaseById(
@@ -31,6 +39,7 @@ export async function getReleaseById(
       headers: {
         Authorization: `Discogs token=${DISCOGS_TOKEN}`,
       },
+      cache: "no-cache",
     }
   );
   const json = await response.json();

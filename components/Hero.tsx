@@ -9,7 +9,7 @@ const Hero = () => {
         /> */}
         <div className="w-full text-center lg:w-2/3">
           <h1 className="mb-4 text-3xl font-medium text-white title-font sm:text-4xl">
-            Discogs Tags formatted for Mp3Tags
+            Discogs Tags formatted for Mp3Tags -- TEST
           </h1>
           <p className="mb-8 leading-relaxed">
             Meggings kinfolk echo park stumptown DIY, kale chips beard jianbing
