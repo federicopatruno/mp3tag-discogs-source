@@ -1,6 +1,10 @@
-const DISCOGS_TOKEN = process.env.DISCOGS_TOKEN || "";
+import axios from "axios";
+
 const suffixRegex: RegExp = new RegExp(/ \(\d+\)$/);
 const artistParenthesisRegex: RegExp = new RegExp(/ \(\d{1,2}\)/);
+const headers = {
+  Authorization: `Discogs token=${process.env.DISCOGS_TOKEN || ""}`,
+};
 
 export async function getDatabaseResults(
   searchParams:
@@ -10,39 +14,26 @@ export async function getDatabaseResults(
     | URLSearchParams
     | undefined
 ) {
-  const response = await fetch(
-    `https://api.discogs.com/database/search?${new URLSearchParams(
-      searchParams
-    )}`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Discogs token=${DISCOGS_TOKEN}`,
-      },
-      cache: "no-cache",
-    }
-  );
+  const response = await axios.get(`https://api.discogs.com/database/search`, {
+    params: searchParams,
+    headers,
+  });
 
-  const results = await response.json();
-
-  return results;
+  // const results = await response.json();
+  return response.data;
 }
 
 export async function getReleaseById(
   releaseId: string,
   multi: boolean = false
 ) {
-  const response = await fetch(
+  const response = await axios.get(
     `https://api.discogs.com/releases/${releaseId}`,
     {
-      method: "GET",
-      headers: {
-        Authorization: `Discogs token=${DISCOGS_TOKEN}`,
-      },
-      cache: "no-cache",
+      headers,
     }
   );
-  const json = await response.json();
+  const json = response.data;
   const albumArtist = parseAlbumArtist(json);
   const tracklist = parseTracklist(json.tracklist, albumArtist, multi);
   const optimized = {
