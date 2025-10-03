@@ -1,7 +1,7 @@
 import { getDatabaseResults } from "@/lib/discogs/actions";
 import { NextRequest, NextResponse } from "next/server";
 
-export const revalidate = 10;
+// export const revalidate = 10;
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request?.url);

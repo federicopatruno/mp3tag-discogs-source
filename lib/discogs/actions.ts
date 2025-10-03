@@ -138,17 +138,17 @@ function parseCompanies(companies: Array<any>) {
 function parseExtraCredits(extraArtists: Array<any>) {
   return extraArtists
     ? extraArtists.map((artist) => {
-        const tmpName = parseField(artist.name);
-        const anv = parseField(artist.anv);
-        const name = (anv && anv !== "" ? anv : tmpName)
-          .replace(suffixRegex, "")
-          .trim();
-        const role = `(${parseField(artist.role).trim()})`;
-        return [name, role]
-          .filter((value: string) => value && value !== "")
-          .join(" ")
-          .trim();
-      })
+      const tmpName = parseField(artist.name);
+      const anv = parseField(artist.anv);
+      const name = (anv && anv !== "" ? anv : tmpName)
+        .replace(suffixRegex, "")
+        .trim();
+      const role = `(${parseField(artist.role).trim()})`;
+      return [name, role]
+        .filter((value: string) => value && value !== "")
+        .join(" ")
+        .trim();
+    })
     : [];
 }
 
